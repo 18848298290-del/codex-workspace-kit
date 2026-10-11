@@ -1,0 +1,10 @@
+.idea/
+.vscode/
+*.log
+*.bak
+*.backup
+auth.json
+.env
+.env.*
+!*.example.env
+**/node_modules/
