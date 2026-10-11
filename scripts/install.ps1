@@ -17,21 +17,20 @@ $backupRoot = Join-Path (Join-Path $stateRoot 'backups') $timestamp
 function Say([string]$message) { Write-Host "[Codex Kit] $message" }
 function RelativeHash([string]$path) { (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash }
 
-if ($PSVersionTable.PSVersion.Major -lt 5) { throw '需要 PowerShell 5.1 或更新版本。' }
-if ($env:OS -ne 'Windows_NT') { throw '本安装程序仅针对 Windows 编写。' }
+if ($PSVersionTable.PSVersion.Major -lt 5) { throw 'PowerShell 5.1 or later is required.' }
+if ($env:OS -ne 'Windows_NT') { throw 'This installer supports Windows only.' }
 
 foreach ($command in @('codex', 'node', 'npm', 'git')) {
-    if (Get-Command $command -ErrorAction SilentlyContinue) { Say "已找到 $command" }
-    else { Say "提示：未找到 $command，部分功能可能不可用。" }
+    if (Get-Command $command -ErrorAction SilentlyContinue) { Say "Found $command" }
+    else { Say "Warning: $command was not found. Some features may not work." }
 }
 
-if ($SkipMcp -and $InstallMcp) { throw '-SkipMcp 与 -InstallMcp 不能同时使用。' }
+if ($SkipMcp -and $InstallMcp) { throw 'Do not combine -SkipMcp and -InstallMcp.' }
 
-$modules = @('Rules', 'Skills', 'Agents')
 if (-not $InstallAll -and -not $DryRun) {
-    Say '将安装 AGENTS.md、Skills 和 Agents。已有同名文件默认跳过。'
-    $answer = Read-Host '继续？输入 YES'
-    if ($answer -cne 'YES') { Say '已取消。'; exit 0 }
+    Say 'Installing AGENTS.md, Skills and Agents. Existing files will be skipped.'
+    $answer = Read-Host 'Continue? Type YES'
+    if ($answer -cne 'YES') { Say 'Cancelled.'; exit 0 }
 }
 
 $items = @()
@@ -51,20 +50,20 @@ if (Test-Path -LiteralPath $manifestPath) {
 
 foreach ($item in $items) {
     $source = Join-Path $root ($item.Source.Replace('/', [IO.Path]::DirectorySeparatorChar))
-    if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { throw "缺少模板：$source" }
+    if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { throw "Missing template: $source" }
     $target = $item.Target
     $existing = @($records | Where-Object { $_.target -eq $target })
     $sourceHash = RelativeHash $source
     if (Test-Path -LiteralPath $target) {
         $currentHash = RelativeHash $target
-        if ($currentHash -eq $sourceHash) { Say "已是最新：$target"; continue }
-        if (-not $Force) { Say "跳过已有文件：$target（使用 -Force 才允许备份后覆盖）"; continue }
+        if ($currentHash -eq $sourceHash) { Say "Already up to date: $target"; continue }
+        if (-not $Force) { Say "Skipping existing file: $target (use -Force only after review)"; continue }
         if ($existing.Count -gt 0 -and $currentHash -ne $existing[0].hash) {
-            Say "警告：文件已被用户修改，仍将按 -Force 请求备份后替换：$target"
+            Say "Warning: local changes detected. Backing up before approved replacement: $target"
         }
     }
 
-    if ($DryRun) { Say "[预览] 安装：$target"; continue }
+    if ($DryRun) { Say "[DRY RUN] Would install: $target"; continue }
     $backup = $null
     if (Test-Path -LiteralPath $target) {
         $backup = Join-Path $backupRoot ($item.Source.Replace('/', [IO.Path]::DirectorySeparatorChar))
@@ -75,7 +74,7 @@ foreach ($item in $items) {
     Copy-Item -LiteralPath $source -Destination $target -Force
     $records = @($records | Where-Object { $_.target -ne $target })
     $records += [pscustomobject]@{ source = $item.Source; target = $target; hash = (RelativeHash $target); backup = $backup }
-    Say "已安装：$target"
+    Say "Installed: $target"
 }
 
 if (-not $DryRun) {
@@ -83,7 +82,7 @@ if (-not $DryRun) {
     $obj = [pscustomobject]@{ version = 1; updated = (Get-Date -Format o); files = @($records) }
     $json = $obj | ConvertTo-Json -Depth 8
     [IO.File]::WriteAllText($manifestPath, $json, (New-Object System.Text.UTF8Encoding($false)))
-    Say "安装记录：$manifestPath"
+    Say "Installation manifest: $manifestPath"
 }
 
 if ($InstallMcp -and -not $SkipMcp) {
@@ -91,10 +90,10 @@ if ($InstallMcp -and -not $SkipMcp) {
         'codex mcp add openaiDeveloperDocs --url https://developers.openai.com/mcp',
         'codex mcp add context7 -- npx -y @upstash/context7-mcp'
     )
-    foreach ($line in $mcpCommands) { Say "[MCP 建议] $line" }
+    foreach ($line in $mcpCommands) { Say "[Optional MCP command] $line" }
     if (-not $DryRun) {
-        Say 'MCP 连接不会由脚本自动执行。请审查提供方和命令后，自行逐条运行。'
+        Say 'MCP commands were not executed. Review their providers and run them manually if approved.'
     }
 }
 
-Say '完成。请重启 Codex 并运行 scripts/verify.ps1。'
+Say 'Done. Restart Codex and run scripts/verify.ps1.'
