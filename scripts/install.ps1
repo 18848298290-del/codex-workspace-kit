@@ -29,8 +29,8 @@ if ($SkipMcp -and $InstallMcp) { throw 'Do not combine -SkipMcp and -InstallMcp.
 
 if (-not $InstallAll -and -not $DryRun) {
     Say 'Installing AGENTS.md, Skills and Agents. Existing files will be skipped.'
-    $answer = Read-Host 'Continue? Type YES'
-    if ($answer -cne 'YES') { Say 'Cancelled.'; exit 0 }
+    $answer = Read-Host 'Continue? Type YES (case-insensitive)'
+    if ($answer.Trim() -ne 'YES') { Say 'Cancelled.'; exit 0 }
 }
 
 $items = @()
