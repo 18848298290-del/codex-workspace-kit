@@ -12,8 +12,8 @@ $manifest = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | Convert
 $remaining = @()
 $processed = 0
 if (-not $DryRun) {
-    $answer = Read-Host 'Restore or remove managed files? Type YES to continue'
-    if ($answer -cne 'YES') { Write-Host 'Cancelled.'; exit 0 }
+    $answer = Read-Host 'Restore or remove managed files? Type YES (case-insensitive) to continue'
+    if ($answer.Trim() -ne 'YES') { Write-Host 'Cancelled.'; exit 0 }
 }
 
 foreach ($entry in @($manifest.files)) {
