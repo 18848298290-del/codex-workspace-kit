@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - 'scripts/**'
+      - 'tests/**'
       - '.github/workflows/powershell-check.yml'
   pull_request:
     paths:
       - 'scripts/**'
+      - 'tests/**'
       - '.github/workflows/powershell-check.yml'
 
 jobs:
@@ -23,7 +25,7 @@ jobs:
         shell: ${{ matrix.shell }}
         run: |
           $errors = @()
-          Get-ChildItem scripts -Filter '*.ps1' | ForEach-Object {
+          Get-ChildItem scripts, tests -Filter '*.ps1' | ForEach-Object {
             $tokens = $null
             $parseErrors = $null
             [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$parseErrors) | Out-Null
@@ -36,3 +38,6 @@ jobs:
       - name: Dry-run installer
         shell: ${{ matrix.shell }}
         run: .\scripts\install.ps1 -DryRun
+      - name: Isolated install and rollback tests
+        shell: ${{ matrix.shell }}
+        run: .\tests\installer.tests.ps1
