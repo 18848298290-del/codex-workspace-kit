@@ -1,8 +1,17 @@
 [CmdletBinding()]
-param([switch]$DryRun)
+param([switch]$DryRun, [string]$TestRoot, [switch]$TestAssumeYes)
 
 $ErrorActionPreference = 'Stop'
-$manifestPath = Join-Path (Join-Path $HOME '.codex-workspace-kit') 'manifest.json'
+$kitHome = $HOME
+if ($TestRoot) {
+    $testPath = [IO.Path]::GetFullPath($TestRoot)
+    $testPrefix = Join-Path ([IO.Path]::GetTempPath()) 'codex-kit-test-'
+    if (-not $testPath.StartsWith($testPrefix, [StringComparison]::OrdinalIgnoreCase) -or
+        -not (Test-Path -LiteralPath $testPath -PathType Container)) { throw 'Invalid TestRoot.' }
+    $kitHome = $testPath
+}
+if ($TestAssumeYes -and -not $TestRoot) { throw 'TestAssumeYes requires a validated TestRoot.' }
+$manifestPath = Join-Path (Join-Path $kitHome '.codex-workspace-kit') 'manifest.json'
 if (-not (Test-Path -LiteralPath $manifestPath)) {
     Write-Host 'No installation manifest found. No files will be removed.'
     exit 0
@@ -11,7 +20,7 @@ if (-not (Test-Path -LiteralPath $manifestPath)) {
 $manifest = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $remaining = @()
 $processed = 0
-if (-not $DryRun) {
+if (-not $DryRun -and -not $TestAssumeYes) {
     $answer = Read-Host 'Restore or remove managed files? Type YES (case-insensitive) to continue'
     if ($answer.Trim() -ne 'YES') { Write-Host 'Cancelled.'; exit 0 }
 }
