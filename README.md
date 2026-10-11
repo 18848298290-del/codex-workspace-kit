@@ -1,64 +1,123 @@
+<div align="center">
+
 # Codex Workspace Kit
 
-**A safer, reusable Codex CLI development toolkit for Windows.**  
-**面向 Windows 的安全、可复用 Codex CLI 开发环境工具包。**
+### A considered workspace for Codex CLI.
 
-This repository bundles global guidance, reusable skills, focused agents, optional MCP integrations, and PowerShell scripts for installation, validation and rollback.
+为 Codex CLI 打造的专业开发工作环境。
 
-本仓库整合全局开发规范、可复用技能、专用 Agent、可选 MCP 集成，以及用于安装、验证和恢复的 PowerShell 脚本。
+**Windows · PowerShell · Codex CLI**
 
-面向 Windows 的 Codex CLI 配置工具包：全局指令、5 个开发 Skills、3 个专用 Agents 和可选 MCP。  
-A ready-to-customize Codex CLI configuration kit: global instructions, five Skills, three Agents, and optional MCP.
+[Get Started](#get-started--快速开始) &nbsp;·&nbsp; [Documentation](#documentation--文档) &nbsp;·&nbsp; [Agent Setup](prompts/agent-auto-install.md)
 
-> **Compatibility / 兼容性：** Codex CLI 0.162.1 (target version), Windows 10/11, PowerShell 5.1/7. The installer does not read or modify `auth.json`. / 适配目标为 Codex CLI 0.162.1，安装程序不读取或修改登录凭据。
->
-> **Release status / 发布状态：** Initial release; Windows end-to-end verification is pending. / 第一版已发布，Windows 实机全流程验证仍待完成。
+</div>
 
-## Quick start / 快速开始
+---
 
-**Agent-guided installation / 让 Agent 自动安装：** Give the [bilingual agent installation prompt / 中英双语 Agent 自动安装提示词](prompts/agent-auto-install.md) to a trusted coding agent with access to your Windows computer. It guides safe inspection, dry run, backup, approval, installation, verification and recovery. / 将这份提示词交给受信任的编程 Agent，它会按检查、预览、备份、授权、安装、验证和恢复流程执行。
+## Built for the way you work.
+
+Codex Workspace Kit brings a clear set of engineering principles, focused coding skills and specialized agents into one reproducible setup. It is designed to integrate with your existing environment — deliberately, transparently and without taking ownership of your personal configuration.
+
+**专注开发，保持掌控。**
+
+将开发规范、专业技能与专用 Agent 整合为可复用的 Codex 工作环境。尊重已有配置、明确每一次变更，让初始化和迁移变得简单可靠。
+
+## What's inside / 核心组件
+
+| | English | 中文 |
+|:--|:--|:--|
+| **Guidance** | Consistent engineering standards through `AGENTS.md` | 全局开发规范与安全边界 |
+| **Skills** | Five task-oriented workflows | 五项专注实际开发的技能 |
+| **Agents** | Three specialized, read-only roles | 三个专注分析与审查的 Agent |
+| **MCP** | Optional developer documentation integrations | 按需连接开发文档服务 |
+| **Tooling** | Preview, install, verify and recover | 安装预览、验证、备份与恢复 |
+
+<details>
+<summary><strong>Explore the included Skills & Agents / 查看技能与智能体</strong></summary>
+
+### Skills
+
+| Skill | Focus / 主要用途 |
+|:--|:--|
+| `bug-fix` | Root-cause debugging / 根因定位与修复 |
+| `code-review` | Actionable code review / 代码审查 |
+| `docker-ops` | Container operations / Docker 部署与排障 |
+| `api-development` | API engineering / API 开发与测试 |
+| `security-audit` | Defensive security review / 防御性安全审计 |
+
+### Agents
+
+| Agent | Focus / 主要用途 |
+|:--|:--|
+| `reviewer` | Correctness and regression risks / 正确性与回归风险 |
+| `debugger` | Failures and call-chain analysis / 故障及调用链分析 |
+| `explorer` | Repository and architecture exploration / 项目与架构探索 |
+
+</details>
+
+## Get started / 快速开始
+
+Designed for **Windows 10/11** and **PowerShell 5.1/7**, targeting **Codex CLI 0.162.1**. Compatibility with other versions should be verified.
+
+面向 Windows 10/11 与 PowerShell 5.1/7，以 Codex CLI 0.162.1 为适配目标。其他版本请先验证兼容性。
 
 ```powershell
 git clone https://github.com/18848298290-del/codex-workspace-kit.git
 cd codex-workspace-kit
+
+# Inspect the changes first / 先预览变更
 .\scripts\install.ps1 -DryRun
+
+# Install / 执行安装
 .\scripts\install.ps1
+
+# Verify / 验证配置
 .\scripts\verify.ps1
 ```
 
-If allowed by your security policy, you can adjust PowerShell execution policy for the current process only. / 若组织安全策略允许，可以只对当前进程临时调整执行策略（不修改全局策略）：
+Existing files are **preserved by default**. The installer does not automatically execute third-party MCP packages or replace your `config.toml`.
 
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-```
+**默认保留已有文件。** 安装程序不会自动运行第三方 MCP，也不会覆盖你的 `config.toml`。
 
-The installer skips existing target files by default. `-Force` backs up and replaces targeted files only after you deliberately choose to use it. `-InstallAll` is non-interactive and does not automatically install MCP. / 默认跳过同名文件；`-Force` 可在备份后替换目标文件，使用前必须明确确认。`-InstallAll` 以非交互方式安装，仍不自动安装 MCP。
+### Prefer an autonomous setup? / 让 Agent 协助安装
 
-```powershell
-.\scripts\install.ps1 -InstallAll -SkipMcp
-.\scripts\install.ps1 -InstallMcp -DryRun
-```
+Use the [Agent Installation Protocol](prompts/agent-auto-install.md) with a trusted coding agent that can access your Windows environment. It guides the process from inspection and review to installation, verification and recovery, while keeping approval for sensitive operations in your hands.
 
-## Components / 项目组成
+如果希望由编程 Agent 完成操作，可以使用 [Agent 自动安装协议](prompts/agent-auto-install.md)。它提供完整的检查、安装、验证和恢复流程，同时保留高风险操作的人工确认。
 
-| Component / 模块 | Installation path / 安装位置 |
-|---|---|
-| 全局规则 | `$HOME\.codex\AGENTS.md` |
-| Skills | `$HOME\.agents\skills\<name>\SKILL.md` |
-| Agents | `$HOME\.codex\agents\<name>.toml` |
-| 可选 MCP | 通过 `codex mcp add` 注册 |
+## Designed with restraint / 设计原则
 
-The installation manifest and backups are stored in `$HOME\.codex-workspace-kit`. Preview uninstall with `.\scripts\uninstall.ps1 -DryRun`; user-modified files are preserved by hash checks. / 安装记录和备份存放在上述目录，卸载会根据文件哈希保护已被用户修改的内容。
+**Predictable by default.** Existing configuration is respected; changes can be previewed before installation.
 
-Read the bilingual [Installation Guide / 安装指南](docs/installation.md), [Configuration Reference / 配置说明](docs/configuration.md), and [Troubleshooting / 故障排查](docs/troubleshooting.md).
+**Secure by design.** No bundled credentials, relay endpoints, forced third-party installs or destructive cleanup.
 
-## Safety principles / 安全原则
+**Recoverable.** Managed files are tracked. Approved replacements are backed up and can be restored.
 
-- No secrets, jailbreak instructions or relay API configuration. / 不含密钥、越狱指令或第三方中转站配置。
-- No destructive Docker volume deletion, database reset or credentials modification. / 不删除数据卷、不重置数据库、不修改凭据。
-- No unrelated file overwrites or automatic changes to `config.toml`. / 不覆盖无关文件，不自动修改现有 `config.toml`。
-- Windows live testing is still required; static checks are not live verification. / Windows 实机验证仍待完成，不将静态检查冒充实测。
+**以可预期为前提。** 默认保留现有配置，执行前可查看具体变更。
 
-## License and contributions / 开源协议与贡献
+**以安全为基础。** 不内置密钥、中转地址或破坏性清理操作，不强制安装第三方组件。
 
-Released under the [MIT License](LICENSE). Issues and pull requests are welcome. Never attach secrets or sensitive logs. / 采用 MIT 开源协议，欢迎提交 Issue 和 PR，但请勿上传密钥或敏感日志。
+**以可恢复为保障。** 跟踪受管理的文件，覆盖前备份，必要时可以恢复。
+
+## Documentation / 文档
+
+| Guide | 说明 |
+|:--|:--|
+| [Installation](docs/installation.md) | Windows 安装与卸载 |
+| [Configuration](docs/configuration.md) | AGENTS.md、Skills、Agents 与 MCP |
+| [Troubleshooting](docs/troubleshooting.md) | 常见问题与故障排查 |
+| [Agent Installation Protocol](prompts/agent-auto-install.md) | 中英双语 Agent 自动安装指令 |
+
+---
+
+<div align="center">
+
+**Open source. Built to be yours.**
+
+开源、透明，由你掌控。
+
+[MIT License](LICENSE)
+
+<sub>Initial release · Windows end-to-end testing is pending / 第一版 · Windows 全流程实机测试待完成</sub>
+
+</div>
