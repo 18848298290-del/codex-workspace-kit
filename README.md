@@ -107,6 +107,7 @@ Use the [Agent Installation Protocol](prompts/agent-auto-install.md) with a trus
 | [Configuration](docs/configuration.md) | AGENTS.md、Skills、Agents 与 MCP |
 | [Troubleshooting](docs/troubleshooting.md) | 常见问题与故障排查 |
 | [Agent Installation Protocol](prompts/agent-auto-install.md) | 中英双语 Agent 自动安装指令 |
+| [Changelog](CHANGELOG.md) | 版本与稳定性修复记录 |
 
 ---
 
