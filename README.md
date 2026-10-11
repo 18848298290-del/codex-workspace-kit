@@ -6,6 +6,8 @@
 
 ## 快速开始
 
+**想让编程 Agent 代为安装？** 将 [中英双语 Agent 自动安装提示词](prompts/agent-auto-install.md) 交给能操作你 Windows 电脑的受信任 Agent。它会要求先检查、预览、备份，再安装和验证，不会绕过高风险操作的用户确认。
+
 ```powershell
 git clone https://github.com/18848298290-del/codex-workspace-kit.git
 cd codex-workspace-kit
