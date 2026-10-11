@@ -1,26 +1,81 @@
-# Troubleshooting / 常见问题
+# Troubleshooting
 
-This bilingual guide covers common discovery, installation and MCP issues. / 本指南提供技能发现、安装与 MCP 故障的常见排查方法。
+Practical diagnostics, without destructive resets.
 
-## Skill missing from `/skills` / 技能未显示
+先定位问题，再采取最小必要操作。
 
-1. 确认 `$HOME\.agents\skills\bug-fix\SKILL.md` 存在。 / Confirm the skill file exists.
-2. 文件开头必须是 YAML frontmatter，包含 `name` 与 `description`。 / Validate its YAML metadata.
-3. 完全退出并重新运行 `codex`。检查 `$env:CODEX_HOME` 是否指向自定义配置目录。 / Restart Codex and check `CODEX_HOME`.
-4. 使用 `Get-Content ... -Raw -Encoding UTF8` 检查文件真实内容，而不是仅凭行数判断。 / Inspect the actual text rather than relying on line counts.
+---
 
-## AGENTS.md skipped / 全局规则被跳过
+## 简体中文
 
-这是保护已有配置的默认行为。先比较新旧文件，确有需要再使用 `-Force`，脚本会备份原文件。 / Existing files are intentionally skipped. Compare differences before using `-Force`; backups are made first.
+### `/skills` 没有找到技能
 
-## MCP unavailable / MCP 不可用
+1. 确认 `$HOME\.agents\skills\bug-fix\SKILL.md` 存在。
+2. 检查文件开头是否有合法 YAML 元数据：`name` 和 `description`。
+3. 完全退出并重新启动 Codex。
+4. 检查 `$env:CODEX_HOME` 是否使用自定义目录。
 
-执行 `codex mcp list`，检查服务器命令和网络；Context7 需要 Node.js/npm/npx。不要把密钥贴到公共 Issue。 / Inspect the MCP list, server commands and connectivity. Context7 needs Node.js/npm/npx; never post tokens in public issues.
+```powershell
+Test-Path "$HOME\.agents\skills\bug-fix\SKILL.md"
+Get-Content "$HOME\.agents\skills\bug-fix\SKILL.md" -TotalCount 8 -Encoding UTF8
+$env:CODEX_HOME
+```
 
-## Restore previous files / 还原
+### 安装时跳过了 `AGENTS.md`
 
-运行 `.\scripts\uninstall.ps1 -DryRun` 检查影响，再执行正式卸载。备份在 `$HOME\.codex-workspace-kit\backups`。 / Preview uninstall first. Timestamped backups are stored under the listed directory.
+这是默认的保护行为。先比较现有文件和仓库模板；只有确认需要替换时才使用 `-Force`，并核对备份是否生成。
 
-## Reporting a bug / 提交问题报告
+### MCP 无法连接
 
-Include Codex and PowerShell versions, the failed command, redacted logs, and dry-run results. Never upload `auth.json`, private keys, tokens or unredacted environment variables. / 请提供版本、失败命令、脱敏日志及预览结果，不要上传登录文件、私钥或 Token。
+运行 `codex mcp list`，检查服务器名称、命令、网络和 Node/npm 环境。第三方 MCP 可能需要联网下载；不要把 Token 上传到公开 Issue。
+
+### 如何恢复
+
+```powershell
+.\scripts\uninstall.ps1 -DryRun
+.\scripts\uninstall.ps1
+```
+
+先预览，再决定是否执行。备份位于 `$HOME\.codex-workspace-kit\backups`。不要删除整个用户配置目录。
+
+---
+
+## English
+
+### A Skill is missing from `/skills`
+
+1. Confirm `$HOME\.agents\skills\bug-fix\SKILL.md` exists.
+2. Check that its YAML frontmatter includes `name` and `description`.
+3. Restart Codex completely.
+4. Check whether `CODEX_HOME` points to a custom location.
+
+```powershell
+Test-Path "$HOME\.agents\skills\bug-fix\SKILL.md"
+Get-Content "$HOME\.agents\skills\bug-fix\SKILL.md" -TotalCount 8 -Encoding UTF8
+$env:CODEX_HOME
+```
+
+### `AGENTS.md` was skipped
+
+This is intentional. Compare the existing file and the template. Use `-Force` only after approving a replacement and checking that a backup will be made.
+
+### MCP connection fails
+
+Run `codex mcp list`. Inspect server configuration, connectivity, and Node/npm availability. Third-party MCP packages may require downloads; never post credentials in public issues.
+
+### Restore previous files
+
+```powershell
+.\scripts\uninstall.ps1 -DryRun
+.\scripts\uninstall.ps1
+```
+
+Preview first. Backups live under `$HOME\.codex-workspace-kit\backups`. Never delete the entire Codex configuration directory as a troubleshooting step.
+
+---
+
+## Reporting issues / 反馈问题
+
+Include the Codex and PowerShell versions, the failing command, a sanitized error log, and whether dry run succeeded. Never attach `auth.json`, API tokens, private keys or unredacted environment variables.
+
+请提供 Codex 与 PowerShell 版本、失败命令、脱敏日志及预览结果。切勿上传登录凭据或未脱敏的环境变量。
