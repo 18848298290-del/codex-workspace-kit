@@ -1,8 +1,16 @@
 [CmdletBinding()]
-param()
+param([string]$TestRoot)
 
 $ErrorActionPreference = 'Stop'
-$stateRoot = Join-Path $HOME '.codex-workspace-kit'
+$kitHome = $HOME
+if ($TestRoot) {
+    $testPath = [IO.Path]::GetFullPath($TestRoot)
+    $testPrefix = Join-Path ([IO.Path]::GetTempPath()) 'codex-kit-test-'
+    if (-not $testPath.StartsWith($testPrefix, [StringComparison]::OrdinalIgnoreCase) -or
+        -not (Test-Path -LiteralPath $testPath -PathType Container)) { throw 'Invalid TestRoot.' }
+    $kitHome = $testPath
+}
+$stateRoot = Join-Path $kitHome '.codex-workspace-kit'
 $manifestPath = Join-Path $stateRoot 'manifest.json'
 $failed = 0
 
@@ -12,7 +20,7 @@ function Check([bool]$pass, [string]$description) {
 }
 
 Check ([bool](Get-Command codex -ErrorAction SilentlyContinue)) 'codex command available'
-Check (Test-Path -LiteralPath (Join-Path $HOME '.codex/AGENTS.md')) 'Global AGENTS.md exists'
+Check (Test-Path -LiteralPath (Join-Path $kitHome '.codex/AGENTS.md')) 'Global AGENTS.md exists'
 Check (Test-Path -LiteralPath $manifestPath) 'Installation manifest exists'
 
 if (Test-Path -LiteralPath $manifestPath) {
@@ -27,7 +35,7 @@ if (Test-Path -LiteralPath $manifestPath) {
     }
 }
 
-$skillRoot = Join-Path $HOME '.agents/skills'
+$skillRoot = Join-Path $kitHome '.agents/skills'
 if (Test-Path $skillRoot) {
     foreach ($skill in @(Get-ChildItem $skillRoot -Directory)) {
         $file = Join-Path $skill.FullName 'SKILL.md'
