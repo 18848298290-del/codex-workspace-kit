@@ -36,6 +36,11 @@ foreach ($entry in @($manifest.files)) {
         $remaining += $entry
         continue
     }
+    if ($entry.backup -and -not (Test-Path -LiteralPath $entry.backup -PathType Leaf)) {
+        Write-Warning "Original backup is missing; preserving the installed file: $($entry.target)"
+        $remaining += $entry
+        continue
+    }
     Write-Host "$(if ($DryRun) { '[DRY RUN] ' })Restore or remove: $($entry.target)"
     if ($DryRun) { continue }
     if ($entry.backup -and (Test-Path -LiteralPath $entry.backup -PathType Leaf)) {
